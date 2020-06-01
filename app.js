@@ -26,6 +26,15 @@ app.get("/music", async (req, res) => {
   res.json(response.rows);
 });
 
+app.post("/music", async (req, res) => {
+  const email = req.cookies.email;
+  await client.query(
+    "INSERT into playlist(email, name, date, genre) values($1, $2, $3, $4)",
+    [email, req.body.name, req.body.date, req.body.genre]
+  );
+  res.json({ ok: true });
+});
+
 app.post("/login", async (req, res) => {
   const email = req.body.email;
   res.cookie("email", email);
