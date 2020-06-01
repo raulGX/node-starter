@@ -2,21 +2,41 @@ var createError = require("http-errors");
 var express = require("express");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+const { Client } = require("pg");
+
 var app = express();
 
+const client = new Client({
+  connectionString:
+    process.env.DB_CONN || "postgres:postgres@127.0.0.1/postgres",
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
 
-app.get("/music", (req, res) => {
-  res.json([
-    { name: "Highway to hell", date: new Date().toLocaleDateString() },
-  ]);
+client.connect();
+
+app.get("/music", async (req, res) => {
+  const email = req.cookies.email;
+  const response = await client.query(
+    "select * from playlist where email = $1",
+    [email]
+  );
+  res.json(response.rows);
 });
 
-app.post("/login", (req, res) => {
-  res.cookie("email", req.body.email);
+app.post("/login", async (req, res) => {
+  const email = req.body.email;
+  res.cookie("email", email);
+
+  var response = await client.query("select * from users where email = $1", [
+    email,
+  ]);
+  if (response.rows.length == "0") {
+    await client.query("INSERT into users values($1)", [email]);
+  }
+
   res.json({
     email: req.body.email,
   });
