@@ -1,9 +1,10 @@
-# node-starter
-
 To run:
 
 ```sh
 npm install
+npm start
+# new terminal window
+cd frontend
 npm start
 ```
 

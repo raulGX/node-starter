@@ -15,6 +15,13 @@ app.get("/music", (req, res) => {
   ]);
 });
 
+app.post("/login", (req, res) => {
+  res.cookie("email", req.body.email);
+  res.json({
+    email: req.body.email,
+  });
+});
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
